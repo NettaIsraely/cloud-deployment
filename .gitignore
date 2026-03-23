@@ -1,0 +1,45 @@
+# === Python bytecode / caches ===
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# === Virtual environments ===
+.venv/
+venv/
+ENV/
+env/
+
+# === Data changes ===
+data/state.json
+
+# === Packaging / builds ===
+build/
+dist/
+node_modules/
+*.tsbuildinfo
+*.egg-info/
+.eggs/
+
+# === Logs & local runtime files ===
+*.log
+*.pid
+
+# === OS / editor junk ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# === Env / secrets ===
+.env
+.env.*
+
+# === Claude CLI local settings ===
+.claude/
