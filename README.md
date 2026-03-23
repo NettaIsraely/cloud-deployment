@@ -1,6 +1,6 @@
 # TLVFlow
 
-A vehicle-sharing management system for Tel Aviv, built as a RESTful API with a React frontend.
+A vehicle-sharing management system for Tel Aviv, built as a RESTful API.
 Users can register, rent bikes, e-bikes and scooters from docking stations across the city, and return them to any station with available capacity.
 The system handles the full ride lifecycle including payments, vehicle maintenance, degradation reporting, and persistent state across restarts.
 
@@ -31,18 +31,16 @@ The system handles the full ride lifecycle including payments, vehicle maintenan
 - **Maintenance pipeline** — batch treatment of eligible vehicles (7+ rides since last treatment or degraded), with type-specific treatments (chain lubrication, battery inspection, firmware update, etc.).
 - **Concurrency safety** — async locks per station and per user to prevent double-booking, station overflow, and duplicate ride starts.
 - **State persistence** — full application state serialized to JSON on shutdown and restored on startup (atomic writes via temp file + rename).
-- **Web UI** — React frontend for registration, starting/ending rides (with “use my location” or enter latitude/longitude), and viewing stations and vehicles. Report degraded is available only during an active ride.
 
 ## Tech Stack
 
 | Component       | Technology            |
 |-----------------|------------------------|
 | Backend         | Python 3.12, FastAPI, Uvicorn (ASGI), Pydantic v2 |
-| Frontend        | React 18, TypeScript, Vite 6 |
 | Testing         | pytest, httpx         |
 | Linting         | Ruff                  |
-| Type Checking   | mypy (backend), TypeScript (frontend) |
-| Build & Env     | setuptools + uv (backend), Vite (frontend) |
+| Type Checking   | mypy                  |
+| Build & Env     | setuptools + uv       |
 
 ## Architecture
 
@@ -66,8 +64,6 @@ The backend follows a **layered architecture** with clear separation of concerns
 │    loaders)                     │  Protocol-based interfaces
 └─────────────────────────────────┘
 ```
-
-The frontend is a single-page React app that talks to the API at `http://localhost:8000` by default (configurable via `VITE_API_URL`).
 
 ## Project Structure
 
@@ -118,18 +114,6 @@ advanced-programming-project/
 │       ├── repositories/
 │       │   └── interfaces.py
 │       └── logging.py
-├── frontend/                     # Frontend (React + Vite)
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   ├── index.css
-│   │   ├── api.ts                # API base URL and helpers
-│   │   └── Toast.tsx
-│   ├── public/
-│   ├── index.html
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── vite.config.ts
 ├── tests/
 │   ├── unit/
 │   └── integration/
@@ -139,9 +123,9 @@ advanced-programming-project/
 
 ## Running the Project
 
-You need both the **backend API** and the **frontend** running. The frontend calls the API at `http://localhost:8000` by default.
+This repository now contains only the backend API.
 
-**Prerequisites:** Python 3.12+, [uv](https://docs.astral.sh/uv/), Node.js 18+ (for the frontend)
+**Prerequisites:** Python 3.12+, [uv](https://docs.astral.sh/uv/)
 
 ---
 
@@ -178,34 +162,11 @@ On first launch, the server loads vehicles and stations from `data/`. On later r
 
 ---
 
-### 2. Run the frontend
-
-Open a **second terminal**. From the project root:
-
-```bash
-cd advanced-programming-project/frontend
-npm install
-npm run dev
-```
-
-The frontend will be at **http://localhost:5173** (or the port Vite prints). Use this URL in the browser; it will talk to the API on port 8000.
-
-To point the frontend at a different API URL, set `VITE_API_URL` before starting:
-
-```bash
-VITE_API_URL=http://localhost:8000 npm run dev
-```
-
----
-
 ### Summary
 
 | Service   | Directory        | Command                          | URL                  |
 |----------|-------------------|----------------------------------|----------------------|
 | Backend  | project root      | `uvicorn tlvflow.api.app:app --reload` | http://localhost:8000 |
-| Frontend | `frontend/`       | `npm run dev`                    | http://localhost:5173 |
-
-Run the backend first, then the frontend. Use the frontend URL in the browser.
 
 ## Domain Model
 
