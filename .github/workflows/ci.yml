@@ -34,3 +34,11 @@ jobs:
 
       - name: Run tests
         run: pytest tests/ -v --cov=src/tlvflow --cov-report=term-missing --cov-fail-under=80
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+          --image $REGION-docker.pkg.dev/$tlvflow-deployment/$REPOSITORY/tlvflow-image:latest \
+          --region $REGION \
+          --platform managed \
+          --allow-unauthenticated
