@@ -1,0 +1,36 @@
+name: Build and Push Docker Image
+
+# Run this workflow every time code is pushed to the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the code from the repository onto the runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Log in to GCP using the service account key we stored in GitHub Secrets
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # Step 3: Configure Docker so it knows how to push to Google Artifact Registry
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+      # Step 4: Build the Docker image and tag it with the Artifact Registry path
+      # The tag format is: REGION-docker.pkg.dev/PROJECT/REPOSITORY/IMAGE:TAG
+      - name: Build Docker image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest .
+
+      # Step 5: Push the built image to Google Artifact Registry
+      - name: Push Docker image
+        run: |
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest
