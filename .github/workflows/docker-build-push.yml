@@ -8,6 +8,10 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+  
+    env:
+      SERVICE_NAME: tlvflow-service
+      REGION: us-central1
 
     steps:
       # Step 1: Download the code from the repository onto the runner
@@ -48,3 +52,13 @@ jobs:
           docker build --tag "${IMAGE_LATEST}" --tag "${IMAGE_SHA}" "${BUILD_CONTEXT}"
           docker push "${IMAGE_LATEST}"
           docker push "${IMAGE_SHA}"
+
+      - name: Deploy to Cloud Run
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image us-central1-docker.pkg.dev/${PROJECT_ID}/tlvflow/tlvflow:latest \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated
