@@ -26,6 +26,9 @@ dev = [
     "pre-commit==3.8.0",
 ]
 
+[project.scripts]
+tlvflow-api = "tlvflow.api.server:run"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
