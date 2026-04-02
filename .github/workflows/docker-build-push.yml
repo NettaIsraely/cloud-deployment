@@ -24,11 +24,13 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      # Step 4: Build the Docker image and tag it with the Artifact Registry path
-      # The tag format is: REGION-docker.pkg.dev/PROJECT/REPOSITORY/IMAGE:TAG
-      - name: Build Docker image
-        run: docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest .
-
-      # Step 5: Push the built image to Google Artifact Registry
-      - name: Push Docker image
-        run: docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest
+      # Step 4: Build and push the Docker image to Artifact Registry
+      # IMAGE env var stores the full registry path to avoid repeating it
+      # We tag with 'latest' and the commit SHA so you can trace exactly which code produced each image
+      - name: Build and push Docker image
+        env:
+          IMAGE: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow
+        run: |
+          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} .
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}
