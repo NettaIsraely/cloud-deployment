@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 from collections import defaultdict
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -29,11 +30,26 @@ from tlvflow.services.link_vehicles import link_vehicles_to_stations
 setup_logging()
 logger = logging.getLogger(__name__)
 
-# Paths relative to project root
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-VEHICLES_CSV = PROJECT_ROOT / "data" / "vehicles.csv"
-STATIONS_CSV = PROJECT_ROOT / "data" / "stations.csv"
-STATE_JSON = PROJECT_ROOT / "data" / "state.json"
+
+def _resolve_data_dir() -> Path:
+    """Resolve TLVFlow data directory from cwd with traversal protection."""
+    configured_dir = Path(os.getenv("TLVFLOW_DATA_DIR", "data"))
+    if configured_dir.is_absolute():
+        return configured_dir
+
+    cwd = Path.cwd().resolve()
+    resolved = (cwd / configured_dir).resolve()
+    if cwd != resolved and cwd not in resolved.parents:
+        raise ValueError(
+            "TLVFLOW_DATA_DIR must stay inside the working directory when relative"
+        )
+    return resolved
+
+
+DATA_DIR = _resolve_data_dir()
+VEHICLES_CSV = DATA_DIR / "vehicles.csv"
+STATIONS_CSV = DATA_DIR / "stations.csv"
+STATE_JSON = DATA_DIR / "state.json"
 
 
 @asynccontextmanager
