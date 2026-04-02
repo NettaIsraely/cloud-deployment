@@ -29,10 +29,20 @@ jobs:
       # We tag with 'latest' and the commit SHA so you can trace exactly which code produced each image
       - name: Build and push Docker image
         env:
-          IMAGE: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
         run: |
-          IMAGE_LATEST="${IMAGE}:latest"
-          IMAGE_SHA="${IMAGE}:${GITHUB_SHA}"
+          PROJECT_ID_CLEAN="$(printf '%s' "${PROJECT_ID}" | tr -d '\r\n')"
+          if [ -z "${PROJECT_ID_CLEAN}" ]; then
+            echo "GCP_PROJECT_ID secret is empty"
+            exit 1
+          fi
+
+          IMAGE="us-central1-docker.pkg.dev/${PROJECT_ID_CLEAN}/tlvflow/tlvflow"
+          IMAGE_CLEAN="$(printf '%s' "${IMAGE}" | tr -d '\r\n')"
+          GITHUB_SHA_CLEAN="$(printf '%s' "${GITHUB_SHA}" | tr -d '\r\n')"
+
+          IMAGE_LATEST="${IMAGE_CLEAN}:latest"
+          IMAGE_SHA="${IMAGE_CLEAN}:${GITHUB_SHA_CLEAN}"
           BUILD_CONTEXT="${GITHUB_WORKSPACE:-.}"
 
           docker build --tag "${IMAGE_LATEST}" --tag "${IMAGE_SHA}" "${BUILD_CONTEXT}"
