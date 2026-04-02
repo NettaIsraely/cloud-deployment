@@ -14,23 +14,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Log in to GCP using the service account key we stored in GitHub Secrets
+      # Step 2: Log in to GCP using the service account key stored in GitHub Secrets
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Step 3: Configure Docker so it knows how to push to Google Artifact Registry
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+      # Step 3: Log Docker in to Google Artifact Registry using the official Docker action
+      # This replaces the raw gcloud shell command — not affected by CRLF line ending issues
+      - name: Log in to Artifact Registry
+        uses: docker/login-action@v3
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GCP_SA_KEY }}
 
-      # Step 4: Build and push the Docker image to Artifact Registry
-      # IMAGE env var stores the full registry path to avoid repeating it
-      # We tag with 'latest' and the commit SHA so you can trace exactly which code produced each image
+      # Step 4: Build the image and push it to Artifact Registry using the official Docker action
+      # Using an Action instead of shell commands avoids Windows CRLF line ending issues
+      # Tags: 'latest' for convenience, commit SHA for traceability
       - name: Build and push Docker image
-        env:
-          IMAGE: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow
-        run: |
-          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} .
-          docker push $IMAGE:latest
-          docker push $IMAGE:${{ github.sha }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest
+            us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:${{ github.sha }}
