@@ -1,0 +1,46 @@
+# Git history — not needed inside the image
+.git/
+.github/
+
+# Python bytecode and tool caches — rebuilt inside the container anyway
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environment — the container installs its own dependencies
+.venv/
+venv/
+
+# Tests — not needed in a production image
+tests/
+
+# Runtime-generated state file — the app creates this fresh on first run
+data/state.json
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Secrets and local config — should never be baked into an image
+.env
+.env.*
+
+# Coverage / CI reports
+.coverage
+coverage.xml
+htmlcov/
+
+# Editor and OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Claude CLI local settings
+.claude/
+
+# Docs — not needed at runtime
+README.md
