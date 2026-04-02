@@ -27,10 +27,8 @@ jobs:
       # Step 4: Build the Docker image and tag it with the Artifact Registry path
       # The tag format is: REGION-docker.pkg.dev/PROJECT/REPOSITORY/IMAGE:TAG
       - name: Build Docker image
-        run: |
-          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest .
+        run: docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest .
 
       # Step 5: Push the built image to Google Artifact Registry
       - name: Push Docker image
-        run: |
-          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest
+        run: docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow:latest
