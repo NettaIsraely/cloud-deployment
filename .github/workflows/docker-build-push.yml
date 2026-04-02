@@ -31,6 +31,10 @@ jobs:
         env:
           IMAGE: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/tlvflow/tlvflow
         run: |
-          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} .
-          docker push $IMAGE:latest
-          docker push $IMAGE:${{ github.sha }}
+          IMAGE_LATEST="${IMAGE}:latest"
+          IMAGE_SHA="${IMAGE}:${GITHUB_SHA}"
+          BUILD_CONTEXT="${GITHUB_WORKSPACE:-.}"
+
+          docker build --tag "${IMAGE_LATEST}" --tag "${IMAGE_SHA}" "${BUILD_CONTEXT}"
+          docker push "${IMAGE_LATEST}"
+          docker push "${IMAGE_SHA}"
