@@ -42,6 +42,21 @@ The system handles the full ride lifecycle including payments, vehicle maintenan
 | Type Checking   | mypy                  |
 | Build & Env     | setuptools + uv       |
 
+## Cloud Deployment
+
+- This project includes a production-ready cloud deployment of the TLVFlow backend using Google Cloud and automated CI/CD.
+- The application is deployed on Google Cloud using a fully automated CI/CD pipeline.
+
+### Public API
+
+Base URL:  
+https://tlvflow-service-832491231348.us-central1.run.app
+
+Interactive API Docs (Swagger):  
+https://tlvflow-service-832491231348.us-central1.run.app/docs
+
+The API is publicly accessible without authentication.
+
 ## Architecture
 
 The backend follows a **layered architecture** with clear separation of concerns:
@@ -64,6 +79,20 @@ The backend follows a **layered architecture** with clear separation of concerns
 │    loaders)                     │  Protocol-based interfaces
 └─────────────────────────────────┘
 ```
+
+## Deployment Architecture
+
+The system follows a containerized cloud deployment architecture:
+
+- The application is packaged as a Docker container
+- GitHub Actions automates the CI/CD pipeline:
+  - Builds the Docker image
+  - Pushes it to Google Artifact Registry
+  - Deploys it to Google Cloud Run
+- Docker images are stored in Artifact Registry
+- Cloud Run runs the container as a serverless service and exposes a public HTTP endpoint
+
+This architecture ensures scalability, reproducibility, and fully automated deployments.
 
 ## Project Structure
 
@@ -247,6 +276,32 @@ The test suite includes **27 test files** organized into:
 
 - **Unit tests** — domain entities, services, repositories, and loaders tested in isolation.
 - **Integration tests** — full API tests using FastAPI's `TestClient` via httpx, covering users, vehicles, stations, and rides endpoints.
+
+## 🔄 CI/CD Pipeline
+
+Every push to the `main` branch automatically triggers:
+
+- Docker image build
+- Push to Google Artifact Registry
+- Deployment to Google Cloud Run
+
+## Secrets Management
+
+Sensitive credentials are securely stored using GitHub Secrets:
+
+- `GCP_SA_KEY` — Google Cloud service account key
+- `GCP_PROJECT_ID` — GCP project identifier
+
+## Manual Deployment
+
+The deployment workflow can also be triggered manually:
+
+1. Go to the **GitHub repository**
+2. Navigate to the **Actions** tab
+3. Select the workflow
+4. Click **Run workflow**
+
+This allows redeploying without making code changes.
 
 ## Data Files
 
